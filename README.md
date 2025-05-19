@@ -98,7 +98,9 @@ Please elaborate an action plan.
 
 ##### Add Security
 
-- Implement authentication and authorization to protect sensitive resources and ensure proper access control.
+- Implement authentication and authorization to protect sensitive resources(creating, deleting, updated) and ensure
+  proper access control.
+- Add pagination to the API to limit the number of results returned in a single request.
 - Ensure all critical configuration values (api keys, DB credentials...) are stored securely using environment
   variables.
 - Add a rate limiter to prevent brute-force attacks and abuse of public APIs.
