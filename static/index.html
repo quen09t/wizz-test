@@ -19,22 +19,27 @@
   </style>
 </head>
 <body>
-  <div id="app" class="container">
-    <section class="section section-container" style="padding-top: 24px; padding-bottom: 5px;">
-        <h2 class="title">Games</h2>
-        <game v-for="(game, index) in games"
-            :key="`game.name-${index}`"
-            :game="game"
-            @save-game="onAddOrUpdateGame"
-            @delete-game="deleteGame" />
-    </section>
-    <section class="section section-container" style="padding-bottom: 10px;">
-      <div class="box">
-        <add-update-game title="Add Game" @save-game="onAddOrUpdateGame" />
-      </div>
-    </section>
-  </div>
-  <script>
+<div id="app" class="container">
+  <section class="section section-container" style="padding-bottom: 10px;">
+    <div class="box">
+      <search-games title="Search Games" @search-games-db="searchGames" :search="search" />
+    </div>
+  </section>
+  <section class="section section-container" style="padding-top: 24px; padding-bottom: 5px;">
+    <h2 class="title">Games</h2>
+    <game v-for="(game, index) in games"
+          :key="`game.name-${index}`"
+          :game="game"
+          @save-game="onAddOrUpdateGame"
+          @delete-game="deleteGame" />
+  </section>
+  <section class="section section-container" style="padding-bottom: 10px;">
+    <div class="box">
+      <add-update-game title="Add Game" @save-game="onAddOrUpdateGame" />
+    </div>
+  </section>
+</div>
+<script>
   const AddUpdateGame = {
     props: ['game', 'title'],
     data () {
@@ -162,11 +167,52 @@
     `
   }
 
+  const Search = {
+    data () {
+      return {
+        name: '', platform: ''
+      }
+    },methods: {
+      searchGames() {
+        this.$emit('search-games-db', { name: this.name, platform: this.platform})
+      }
+    },
+    template: `
+       <form class="form" @submit.prevent="searchGames">
+         <h2 class="title">Search Games</h2>
+         <div class="field">
+          <label>Name</label>
+          <div class="control">
+            <input class="input" type="text" v-model="name">
+          </div>
+        </div>
+        <div class="field">
+          <label>Platform</label>
+          <div class="control">
+            <div class="control">
+              <select v-model="platform" class="input">
+                <option value="">All</option>
+                <option>ios</option>
+                <option>android</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button class="button is-success">Search</button>
+          </div>
+        </div>
+      </form>
+    `
+  }
+
   new Vue({
     el: '#app',
-    components: { game: Game, 'add-update-game': AddUpdateGame },
+    components: { game: Game, 'add-update-game': AddUpdateGame, 'search-games': Search },
     data: {
       games: [],
+      search: [],
       apiURL: 'http://localhost:3000/api/games'
     },
     methods: {
@@ -203,6 +249,12 @@
             copy.splice(idx, 1)
             this.games = copy
           })
+      },
+      searchGames (search) {
+        return axios.post(`${this.apiURL}/search`, search)
+          .then((response) => {
+            this.games = response.data
+          })
       }
     },
     beforeMount () {
@@ -213,6 +265,6 @@
     }
   })
 
-  </script>
+</script>
 </body>
 </html>

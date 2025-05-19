@@ -60,6 +60,36 @@ describe('GET /api/games', function () {
     });
 });
 
+/**
+ * Testing create game endpoint
+ */
+describe('POST /api/games/search', function () {
+    let data = {
+        name: "test",
+        platform: "ios",
+    }
+
+    it('respond with 200 and an object that matches what we created by name and platform', function (done) {
+        request(app)
+            .post('/api/games/search')
+            .send(data)
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end((err, result) => {
+                if (err) return done(err);
+                assert.strictEqual(result.body[0].publisherId, '1234567890');
+                assert.strictEqual(result.body[0].name, 'Test App');
+                assert.strictEqual(result.body[0].platform, 'ios');
+                assert.strictEqual(result.body[0].storeId, '1234');
+                assert.strictEqual(result.body[0].bundleId, 'test.bundle.id');
+                assert.strictEqual(result.body[0].appVersion, '1.0.0');
+                assert.strictEqual(result.body[0].isPublished, true);
+                done();
+            });
+    });
+});
+
 
 /**
  * Testing update game endpoint
